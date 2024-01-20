@@ -5,8 +5,8 @@
 
 ## Repository Contents
 
-- [[./LLM Test Answer Sheet]] is the answer sheet, providing GPT-4 level quality answers (since it's... well, the best).
-- [[./LLM Test]] is the blank testing sheet with questions only and blank A: spots where you should put the specific LLM's answers into.
+- `LLM Test Answer Sheet` is the answer sheet, providing GPT-4 level quality answers (since it's... well, the best).
+- `LLM Test` is the blank testing sheet with questions only and blank A: spots where you should put the specific LLM's answers into.
 
 ## How to Use
 
@@ -23,8 +23,8 @@
 4. Use the "Generate Text!" command from Text Generator, either via command palette or your designated hotkey.
 5. Copy the generated answer once your LLM is finished processing into the test sheet.
 6. Rinse and repeat for all the questions.
-7. Reference the completed test sheet vs. the [[./LLM Test Answer Sheet]] and see how many it got correct.
-8. Suggestion: name the test sheet as the model name and then the total score at the end (ex. Zephyr 7B 8-20)
+7. Reference the completed test sheet vs. the `LLM Test Answer Sheet` and see how many it got correct.
+8. Suggestion: name the test sheet as the model name and then the total score at the end (ex. `Zephyr 7B 8-20`)
 
 ## Contribution
 
