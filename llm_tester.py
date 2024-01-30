@@ -1,8 +1,11 @@
-from openai import OpenAI
+from openai import OpenAI, types
 from pathlib import Path
 
+# type simplification
+ChatCompletionMessage = types.chat.chat_completion_message.ChatCompletionMessage
+ChatHistoryEntry = ChatCompletionMessage | dict[str, str]
+
 # Globals
-messageHistory = []
 requestOptions = {}
 
 
@@ -38,7 +41,7 @@ def getRequestOptions() -> dict:
     return requestOptions
 
 
-def getAnswer(api: OpenAI, message: str) -> str:
+def getAnswer(api: OpenAI, messages: list[ChatHistoryEntry]) -> ChatCompletionMessage:
     """
     Send a message to the OpenAI API and retrieve the corresponding answer.
 
@@ -59,55 +62,83 @@ def getAnswer(api: OpenAI, message: str) -> str:
         messageHistory (List[Dict[str, str]]): A list of message dictionaries maintaining
         the history of interactions. Each dictionary has 'role' and 'content' as keys.
     """
-    global messageHistory
-
-    # Ensure the message has no leading/trailing whitespace.
-    message = message.strip()
-
-    messageHistory.append({"role": "user", "content": message})
-
     # Send the message to the API and get the response.
     completion = api.chat.completions.create(
         **getRequestOptions(),
-        messages=messageHistory
+        messages=messages
     )
 
     # add the answer to the history and return it
     answer = completion.choices[0].message
-    messageHistory.append(answer)
-    return answer.content.strip()
+    return answer
+
+
+def getMessageHistoryEntry(content: str | ChatCompletionMessage, role: str = 'user') -> ChatHistoryEntry:
+    """
+    Convert the input to an Entry for the Messagehistory.
+
+    Args:
+        content (str | ChatCompletionMessage): the content of the message or a ChatCompletionMessage.
+        role (str, optional): the role to use for the message if the content is not a ChatCompletionMessage. Defaults to 'user'.
+
+    Returns:
+        ChatHistoryEntry: an Entry that can be addede to the message history.
+
+    """
+    if isinstance(content, ChatCompletionMessage):
+        return content
+    else:
+        return {'role': str(role), 'content': str(content)}
+
+
+def fillOutputFileUsingConversationHistory(api: OpenAI, system_message: str | None, inputFile: Path, outputFile: Path) -> None:
+    """
+    Run the Test while providing the complete history as a chatlog
+
+    Args:
+        api (OpenAI): the OpenAi API Object.
+        system_message (str | None): the System Message.
+        inputFile (Path): the File the Test should be read from.
+        outputFile (Path): the file the result should be written to.
+
+    Returns:
+        None.
+
+    """
+    messages = []
+    if system_message:
+        messages.append(getMessageHistoryEntry(content=system_message, role='system'))
+    with inputFile.open('r', encoding='UTF-8') as inputFile:
+        with outputFile.open('w', encoding='UTF-8') as outputFile:
+            for line in inputFile:
+                if line.startswith('- Q: '):
+                    outputFile.write(line)
+                    line = line[5:].strip()
+                    print("generating answer for:", line)
+                    messages.append(getMessageHistoryEntry(content=line))  # appending current line to message log
+                    answer = getAnswer(api, messages)  # generating response to the question
+                    messages.append(answer)  # appending the answer to the message log
+                    outputFile.write('- A: ' + answer.content.strip() + '\n')
+                elif line.startswith('- A:'):
+                    pass
+                else:
+                    outputFile.write(line)
 
 
 def main() -> None:
     """Execute the Main Program"""
-    global messageHistory
-
     # get connection details
     api_key = inputStringOrNull("please enter the API key (leave empty to load from environment variables): ")
     base_url = inputStringOrNull("please enter the baseUrl (leave empty to load from environment variables or to use OpenAI): ")
     outputFile = Path(inputStringOrDefault("what should the name (and path) of the result file be? ", "LLM TestResult.md"))
     inputFile = Path(inputStringOrDefault("what is the name (and path) of the test file? ", "LLM Test.md"))
     system_message = inputStringOrNull("what should the System message be (empty for none)? ")
-    if system_message:
-        messageHistory.append({"role": "system", "content": system_message})
-
     getRequestOptions()
 
     outputFile.parent.mkdir(parents=True, exist_ok=True)
-
     api = OpenAI(base_url=base_url, api_key=api_key)
 
-    with inputFile.open('r', encoding='UTF-8') as inputFile:
-        with outputFile.open('w', encoding='UTF-8') as outputFile:
-            for line in inputFile:
-                if line.startswith('- Q: '):
-                    outputFile.write(line)
-                    print("generating answer for:", line[5:].strip())
-                    outputFile.write('- A: ' + getAnswer(api, line[5:]) + '\n')
-                elif line.startswith('- A:'):
-                    pass
-                else:
-                    outputFile.write(line)
+    fillOutputFileUsingConversationHistory(api, system_message, inputFile, outputFile)
 
 
 # Helper functions:
