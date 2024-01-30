@@ -164,6 +164,49 @@ def fillOutputFileUsingFileContent(api: OpenAI, system_message: str | None, inpu
                     outputFile.write(line)
 
 
+def fillOutputFileUsingLimitedConversationHistory(api: OpenAI, system_message: str | None, inputFile: Path, outputFile: Path, historyLength: int) -> None:
+    """
+    Run the Test while providing only the last x questions & answers as chatlog
+
+    Args:
+        api (OpenAI): the OpenAi API Object.
+        system_message (str | None): the System Message.
+        inputFile (Path): the File the Test should be read from.
+        outputFile (Path): the file the result should be written to.
+        historyLengt (int): how may history Entrys (questions + answers) to include (the System Message doesn't count)
+
+    Returns:
+        None.
+
+    """
+    messages = []
+    if system_message:
+        system_message_entry = getMessageHistoryEntry(content=system_message, role='system')
+    else:
+        system_message_entry = None
+
+    with inputFile.open('r', encoding='UTF-8') as inputFile:
+        with outputFile.open('w', encoding='UTF-8') as outputFile:
+            for line in inputFile:
+                if line.startswith('- Q: '):
+                    outputFile.write(line)
+                    line = line[5:].strip()
+                    print("generating answer for:", line)
+                    messages.append(getMessageHistoryEntry(content=line))  # appending current line to message log
+                    if len(messages) > historyLength:
+                        messages = messages[historyLength * -1:]
+                    if system_message_entry:
+                        answer = getAnswer(api, [system_message_entry] + messages)  # generating response to the question
+                    else:
+                        answer = getAnswer(api, messages)  # generating response to the question
+                    messages.append(answer)  # appending the answer to the message log
+                    outputFile.write('- A: ' + answer.content.strip() + '\n')
+                elif line.startswith('- A:'):
+                    pass
+                else:
+                    outputFile.write(line)
+
+
 def main() -> None:
     """Execute the Main Program"""
     # get connection details
@@ -177,11 +220,14 @@ def main() -> None:
     outputFile.parent.mkdir(parents=True, exist_ok=True)
     api = OpenAI(base_url=base_url, api_key=api_key)
 
-    testingMode = inputChoice("What mode should be tested on?", ["full chat history", "full file so far"])
+    testingMode = inputChoice("What mode should be tested on?", ["full chat history", "full file so far", "limited chat history"])
     if testingMode == "full chat history":
         fillOutputFileUsingConversationHistory(api, system_message, inputFile, outputFile)
     elif testingMode == "full file so far":
         fillOutputFileUsingFileContent(api, system_message, inputFile, outputFile)
+    elif testingMode == "limited chat history":
+        historyLength = inputInt("how many messages should be saved in the history (questions as well as answers count, the system message (if set) doesn't count)", allow_null=False)
+        fillOutputFileUsingLimitedConversationHistory(api, system_message, inputFile, outputFile, historyLength)
 
 
 # Helper functions:
