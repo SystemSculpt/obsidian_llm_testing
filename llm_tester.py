@@ -125,6 +125,45 @@ def fillOutputFileUsingConversationHistory(api: OpenAI, system_message: str | No
                     outputFile.write(line)
 
 
+def fillOutputFileUsingFileContent(api: OpenAI, system_message: str | None, inputFile: Path, outputFile: Path) -> None:
+    """
+    Run the Test while providing the complete file so far
+
+    Args:
+        api (OpenAI): the OpenAi API Object.
+        system_message (str | None): the System Message.
+        inputFile (Path): the File the Test should be read from.
+        outputFile (Path): the file the result should be written to.
+
+    Returns:
+        None.
+
+    """
+    history = ""
+    with inputFile.open('r', encoding='UTF-8') as inputFile:
+        with outputFile.open('w', encoding='UTF-8') as outputFile:
+            for line in inputFile:
+                if line.startswith('- Q: '):
+                    line = line + '- A:'
+                    history += line
+                    outputFile.write(line)
+                    print("generating answer for:", line)
+                    messages = []
+                    if system_message:
+                        messages.append(getMessageHistoryEntry(content=system_message, role='system'))
+                    messages.append(getMessageHistoryEntry(content=history))  # appending current line to message log
+                    answer = getAnswer(api, messages).content  # generating response to the question
+                    if not answer.endswith('\n'):
+                        answer += '\n'
+                    history += answer
+                    outputFile.write(answer)
+                elif line.startswith('- A:'):
+                    pass
+                else:
+                    history += line
+                    outputFile.write(line)
+
+
 def main() -> None:
     """Execute the Main Program"""
     # get connection details
@@ -138,10 +177,44 @@ def main() -> None:
     outputFile.parent.mkdir(parents=True, exist_ok=True)
     api = OpenAI(base_url=base_url, api_key=api_key)
 
-    fillOutputFileUsingConversationHistory(api, system_message, inputFile, outputFile)
+    testingMode = inputChoice("What mode should be tested on?", ["full chat history", "full file so far"])
+    if testingMode == "full chat history":
+        fillOutputFileUsingConversationHistory(api, system_message, inputFile, outputFile)
+    elif testingMode == "full file so far":
+        fillOutputFileUsingFileContent(api, system_message, inputFile, outputFile)
 
 
 # Helper functions:
+def inputChoice(question: str, choices: list[str]) -> str:
+    """
+    Ask the User to choose an Item from the list
+
+    Args:
+        question (str): the question the User is presented with.
+        choices (list[str]): the otions the user can choose from.
+
+    Returns:
+        str: the choosen option.
+
+    """
+    while True:
+        print(question, '\n')
+        i = 1
+        for choice in choices:
+            print(F"{i}. {choice}")
+            i += 1
+        response = input("Choice: ")
+        if response in choices:
+            return response
+        try:
+            response = int(response)
+            if response <= len(choices) and response > 0:
+                return choices[response - 1]
+        except Exception:
+            pass
+        print("not a valid option, please retry")
+
+
 def inputFloatBetween(question: str, min_value: float, max_value: float, allow_null: bool = False) -> float | None:
     """
     Get a float between min_value and max_value from the user
