@@ -17,12 +17,23 @@
 - Here's [another video showing how to get set up appropriately, so check this one out too.](https://www.youtube.com/watch?v=SAKr008Z8NU)
 
 ### Conducting Testing
+#### Manually
 1. Make sure you've set everything up and loaded the local LLM (see videos above if you don't understand).
 2. Create a copy of the LLM Test sheet and name it appropriately so you have a reference as to which model you're testing.
 3. Copy a question into a brand new note.
 4. Use the "Generate Text!" command from Text Generator, either via command palette or your designated hotkey.
 5. Copy the generated answer once your LLM is finished processing into the test sheet.
 6. Rinse and repeat for all the questions.
+7. Reference the completed test sheet vs. the `LLM Test Answer Sheet` and see how many it got correct.
+8. Suggestion: name the test sheet as the model name and then the total score at the end (ex. `Zephyr 7B 8-20`)
+#### "Automatic"
+1. Install [Python](https://www.python.org/) if not already installed
+2. Install the [OpenAI Python API](https://pypi.org/project/openai/) by running `pip install openai` in a terminal / commandline if not already installed
+3. Make sure you've loaded a local LLM (see above video for refference)
+4. Start the automatic Testing script by either
+  - starting the file `llm_test.py` by doubleclicking it or
+  - executing `python llm_tester.py` (`py llm_tester.py` on Windows) in a terminal
+6. Provide the script the required infomations, once it outputs "generating answer for:" it asks all Questions from the `LLM Test` file and exists once that's complete
 7. Reference the completed test sheet vs. the `LLM Test Answer Sheet` and see how many it got correct.
 8. Suggestion: name the test sheet as the model name and then the total score at the end (ex. `Zephyr 7B 8-20`)
 
