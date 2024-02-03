@@ -1,0 +1,62 @@
+import os
+import re
+from app.file_utils import write_to_file, create_results_directory, extract_version, get_current_datetime, extract_questions_from_file
+from app.openai_client import initialize_client, get_completion
+from app.config import SEPARATOR, GREEN, CYAN, YELLOW, RESET
+
+def initialize_test():
+    llm_name = input("For your personal tracking purposes, what is the name of the LLM you are using? ")
+    results_dir = create_results_directory(llm_name)
+    version = extract_version('LLM Test.md')
+    current_datetime = get_current_datetime()
+    test_file_path = os.path.join(results_dir, f"Test v{version} {current_datetime}.md")
+    questions = extract_questions_from_file('LLM Test.md')
+    client = initialize_client()
+    return llm_name, results_dir, version, current_datetime, test_file_path, questions, client
+
+def handle_questions(test_file_path, questions, client):
+    pass_count = 0
+    total_count = 0
+    for question in questions:
+        print(SEPARATOR)
+        input(f"{GREEN}Press Enter to continue to the next question...{RESET}\n")
+        history = [
+            {"role": "system", "content": f"You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful."},
+            {"role": "user", "content": question.strip()},
+        ]
+        completion = get_completion(client, history)
+        buffer = ""
+        write_to_file(test_file_path, f"## Q:\n{question.strip()}\n\n## A:\n")
+        print(f"{CYAN}Q:{RESET}\n{CYAN}{question.strip()}{RESET}\n")
+        print(f"{YELLOW}A:{RESET}")
+        for chunk in completion:
+            content = chunk.choices[0].delta.content
+            if content is not None:
+                print(f"{YELLOW}{content}{RESET}", end="", flush=True)
+                buffer += content
+                if "\n" in content:
+                    lines = buffer.split("\n")
+                    for line in lines[:-1]:
+                        write_to_file(test_file_path, line + "\n")
+                    buffer = lines[-1]
+        write_to_file(test_file_path, buffer + "\n\n")
+        buffer = ""  # Clear the buffer for the next question
+        grade = input("\n\nThat's the end of the LLM's response.\nDid the LLM pass according to your personal response preferences? (y/n) ")
+        while grade not in ['y', 'n']:
+            grade = input("\nOnly type y for Yes or n for No; Did the LLM pass according to your personal response preferences? (y/n) ")
+        if grade == 'y':
+            write_to_file(test_file_path, "## Grade: PASS!\n\n")
+            pass_count += 1
+        else:
+            write_to_file(test_file_path, "## Grade: FAIL.\n\n")
+        total_count += 1
+    return pass_count, total_count
+
+def finalize_grading(test_file_path, pass_count, total_count):
+    final_grade = f"\n\n## Final Grade: {pass_count}/{total_count}\n"
+    with open(test_file_path, 'r') as file:
+        content = file.read()
+    position = re.search(r"\n(## .+)", content).end()
+    updated_content = content[:position] + final_grade + content[position:]
+    with open(test_file_path, 'w') as file:
+        file.write(updated_content)
