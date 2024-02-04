@@ -17,7 +17,7 @@ def extract_version(file_path):
             raise ValueError("Version not found in the file.")
 
 def get_current_datetime():
-    return datetime.now().strftime("%Y-%m-%d %H:%M")
+    return datetime.now().strftime("%Y-%m-%d %H-%M")
 
 def extract_questions_from_file(file_path):
     questions = []

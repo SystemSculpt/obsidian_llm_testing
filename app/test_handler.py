@@ -1,18 +1,17 @@
 import os
 import re
 from app.file_utils import write_to_file, create_results_directory, extract_version, get_current_datetime, extract_questions_from_file
-from app.openai_client import initialize_client, get_completion
+from app.openai_client import initialize_client, get_completion, get_model_name
 from app.config import SEPARATOR, GREEN, CYAN, YELLOW, RESET
 
 def initialize_test(llm_name=None):
-    if llm_name is None:
-        llm_name = input("For your personal tracking purposes, what is the name of the LLM you are using? ")
+    client = initialize_client()
+    llm_name = get_model_name(client)
     results_dir = create_results_directory(llm_name)
     version = extract_version('LLM Test.md')
     current_datetime = get_current_datetime()
     test_file_path = os.path.join(results_dir, f"Test v{version} {current_datetime}.md")
     questions = extract_questions_from_file('LLM Test.md')
-    client = initialize_client()
     return llm_name, results_dir, version, current_datetime, test_file_path, questions, client
 
 def handle_questions(test_file_path, questions, client):
