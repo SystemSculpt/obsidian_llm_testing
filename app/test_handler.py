@@ -14,41 +14,46 @@ def initialize_test(llm_name=None):
     questions = extract_questions_from_file('LLM Test.md')
     return llm_name, results_dir, version, current_datetime, test_file_path, questions, client
 
+def process_question(question, client, test_file_path):
+    print(SEPARATOR)
+    history = [
+        {"role": "system", "content": "You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful."},
+        {"role": "user", "content": question.strip()},
+    ]
+    completion = get_completion(client, history)
+    buffer = ""
+    write_to_file(test_file_path, f"## Q:\n{question.strip()}\n\n## A:\n")
+    print(f"{CYAN}Q:{RESET}\n{CYAN}{question.strip()}{RESET}\n")
+    print(f"{YELLOW}A:{RESET}")
+    for chunk in completion:
+        content = chunk.choices[0].delta.content
+        if content:
+            print(f"{YELLOW}{content}{RESET}", end="", flush=True)
+            buffer += content
+            if "\n" in content:
+                lines = buffer.split("\n")
+                for line in lines[:-1]:
+                    write_to_file(test_file_path, line + "\n")
+                buffer = lines[-1]
+    write_to_file(test_file_path, buffer + "\n\n")
+
+def grade_response():
+    grade = input("\n\nThat's the end of the LLM's response.\nDid the LLM pass according to your personal response preferences? (y/n) ")
+    while grade not in ['y', 'n']:
+        grade = input("\nOnly type y for Yes or n for No; Did the LLM pass according to your personal response preferences? (y/n) ")
+    return grade == 'y'
+
 def handle_questions(test_file_path, questions, client):
     pass_count = 0
     total_count = 0
-    for index, question in enumerate(questions):
-        print(SEPARATOR)
-        history = [
-            {"role": "system", "content": f"You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful."},
-            {"role": "user", "content": question.strip()},
-        ]
+    for question in questions:
         try:
-            completion = get_completion(client, history)
-            buffer = ""
-            write_to_file(test_file_path, f"## Q:\n{question.strip()}\n\n## A:\n")
-            print(f"{CYAN}Q:{RESET}\n{CYAN}{question.strip()}{RESET}\n")
-            print(f"{YELLOW}A:{RESET}")
-            for chunk in completion:
-                content = chunk.choices[0].delta.content
-                if content is not None:
-                    print(f"{YELLOW}{content}{RESET}", end="", flush=True)
-                    buffer += content
-                    if "\n" in content:
-                        lines = buffer.split("\n")
-                        for line in lines[:-1]:
-                            write_to_file(test_file_path, line + "\n")
-                        buffer = lines[-1]
-            write_to_file(test_file_path, buffer + "\n\n")
+            process_question(question, client, test_file_path)
         except KeyboardInterrupt:
             print("\n\nLLM's response was interrupted. Ending answer here.")
             write_to_file(test_file_path, "\n\n## Answer Interrupted\n\n")
         finally:
-            buffer = ""  # Clear the buffer for the next question
-            grade = input("\n\nThat's the end of the LLM's response.\nDid the LLM pass according to your personal response preferences? (y/n) ")
-            while grade not in ['y', 'n']:
-                grade = input("\nOnly type y for Yes or n for No; Did the LLM pass according to your personal response preferences? (y/n) ")
-            if grade == 'y':
+            if grade_response():
                 write_to_file(test_file_path, "## Grade: PASS!\n\n")
                 pass_count += 1
             else:
@@ -66,7 +71,7 @@ def finalize_grading(test_file_path, pass_count, total_count):
         file.write(updated_content)
 
 def run_tests_loop():
-    llm_name = None  # Initialize llm_name outside the loop
+    llm_name = None
     while True:
         llm_name, results_dir, version, current_datetime, test_file_path, questions, client = initialize_test(llm_name)
         write_to_file(test_file_path, f"# Test v{version} {current_datetime}\n\n## {llm_name}\n\n")
@@ -78,4 +83,4 @@ def run_tests_loop():
         retry = input("Do you want to run the test again? (y/n): ").strip().lower()
         if retry != 'y':
             print("Exiting the testing process. Goodbye!")
-            break  # Exit the loop and end the program
+            break
