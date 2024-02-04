@@ -17,9 +17,8 @@ def initialize_test(llm_name=None):
 def handle_questions(test_file_path, questions, client):
     pass_count = 0
     total_count = 0
-    for question in questions:
+    for index, question in enumerate(questions):
         print(SEPARATOR)
-        input(f"{GREEN}Press Enter to continue to the next question...{RESET}\n")
         history = [
             {"role": "system", "content": f"You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful."},
             {"role": "user", "content": question.strip()},
