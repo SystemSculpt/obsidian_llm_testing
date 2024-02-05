@@ -7,6 +7,16 @@
 
 ## How to Use
 
+- The point of this is to test out your local LLM with questions that are relevant to your personal knowledge management system.
+
+- Keep in mind, the questions found in `LLM_Test.md` are just examples. You should add your own questions, or modify the existing ones to better suit your needs. Just make sure to follow the same format and structure:
+
+```markdown
+**Q:** [Question here]
+
+**A:** [Leave this blank, this is for the regex to know where to stop. Confused? Just look at the examples in the file.]
+```
+
 ### Prerequisites
 
 - A decent computing system. I personally use 7B parameter models and I'm on an M1 Macbook Pro with 16GB of RAM.
@@ -26,6 +36,9 @@
   ```bash
   git clone https://github.com/systemsculpt/obsidian_llm_testing
   ```
+
+````
+
 - Navigate into the repository:
   ```bash
   cd obsidian_llm_testing
@@ -50,3 +63,4 @@
   - Fork this repository.
   - Make your changes and test them in Obsidian.
   - Submit a pull request with a description of your additions or changes.
+````
