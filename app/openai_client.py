@@ -35,7 +35,7 @@ def extract_model_name_from_id(model_id):
     model_name = model_id.split('/')[-1]
     return model_name
 
-def get_completion(client, history, temperature=0.7, stream=True):
+def get_completion(client, history, temperature=0.2, stream=True):
     while True:
         try:
             return client.chat.completions.create(
