@@ -2,8 +2,8 @@ import os
 import re
 from datetime import datetime
 
-def create_results_directory(llm_name):
-    results_dir = f"./results/{llm_name}"
+def create_results_directory(llm_name, version):
+    results_dir = f"./results/v{version}/{llm_name}" 
     os.makedirs(results_dir, exist_ok=True)
     return results_dir
 

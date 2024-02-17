@@ -20,6 +20,9 @@ def check_and_get_model_name(client):
             return model_name
         except APIConnectionError as e:
             handle_connection_error(e)
+        except KeyboardInterrupt:
+            print("\n\nExiting application...")
+            exit(0)
 
 def get_model_name(client):
     try:
@@ -46,10 +49,17 @@ def get_completion(client, history, temperature=0.2, stream=True):
             )
         except APIConnectionError as e:
             handle_connection_error(e)
+        except KeyboardInterrupt:
+            print("\n\nExiting application...")
+            exit(0)
 
 def handle_connection_error(e):
     print(f"\n{e}")
     print("Ensure your LLM is running and accessible at http://localhost:1234/v1")
     print("Check if the LLM service is running and listening on the correct port.")
-    print("Press Enter to try connecting again, or Ctrl+C to exit.")
-    input()
+    try:
+        print("Press Enter to try connecting again, or Ctrl+C to exit.")
+        input()
+    except KeyboardInterrupt:
+        print("\n\nExiting application...")
+        exit(0)

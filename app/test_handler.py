@@ -7,10 +7,10 @@ from app.config import SEPARATOR, GREEN, CYAN, YELLOW, RESET
 def initialize_test(llm_name=None):
     client = initialize_client()
     llm_name = get_model_name(client)
-    results_dir = create_results_directory(llm_name)
     version = extract_version('LLM Test.md')
+    results_dir = create_results_directory(llm_name, version)
     current_datetime = get_current_datetime()
-    test_file_path = os.path.join(results_dir, f"Test v{version} {current_datetime}.md")
+    test_file_path = os.path.join(results_dir, f"{current_datetime}.md")
     questions = extract_questions_from_file('LLM Test.md')
     return llm_name, results_dir, version, current_datetime, test_file_path, questions, client
 
@@ -38,10 +38,14 @@ def process_question(question, client, test_file_path):
     write_to_file(test_file_path, buffer + "\n\n")
 
 def grade_response():
-    grade = input("\n\nThat's the end of the LLM's response.\nDid the LLM pass according to your personal response preferences? (y/n) ")
-    while grade not in ['y', 'n']:
-        grade = input("\nOnly type y for Yes or n for No; Did the LLM pass according to your personal response preferences? (y/n) ")
-    return grade == 'y'
+    try:
+        grade = input("\n\nThat's the end of the LLM's response.\nDid the LLM pass according to your personal response preferences? (y/n) ")
+        while grade not in ['y', 'n']:
+            grade = input("\nOnly type y for Yes or n for No; Did the LLM pass according to your personal response preferences? (y/n) ")
+        return grade == 'y'
+    except KeyboardInterrupt:
+        print("\n\nExiting application...")
+        exit(0)
 
 def handle_questions(test_file_path, questions, client):
     pass_count = 0
