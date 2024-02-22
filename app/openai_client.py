@@ -45,7 +45,7 @@ def get_completion(client, history, temperature=0.2, stream=True):
                 model=model_name,  # Use the global variable
                 messages=history,
                 temperature=temperature,
-                stream=stream,
+                stream=stream, 
             )
         except APIConnectionError as e:
             handle_connection_error(e)

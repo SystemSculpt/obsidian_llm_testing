@@ -82,9 +82,9 @@ def run_tests_loop():
         pass_count, total_count = handle_questions(test_file_path, questions, client)
         finalize_grading(test_file_path, pass_count, total_count)
         
-        print(f"\nTesting Complete. Final Score: {pass_count}/{total_count}")
+        print(f"\nTESTING COMPLETE.\nFinal Score: {pass_count}/{total_count}")
         
-        retry = input("Do you want to run the test again? (y/n): ").strip().lower()
+        retry = input("\nDo you want to run the test again? (y/n): ").strip().lower()
         if retry != 'y':
-            print("Exiting the testing process. Goodbye!")
+            print("\nExiting the testing process. Goodbye!")
             break
