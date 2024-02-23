@@ -11,10 +11,15 @@
 
 - Keep in mind, the questions found in `LLM_Test.md` are just examples. You should add your own questions, or modify the existing ones to better suit your needs. Just make sure to follow the same format and structure:
 
-```markdown
-**Q:** [Question here]
+- A question is registered with each `**Q:**`.
 
-**A:** [Leave this blank, this is for the regex to know where to stop. Confused? Just look at the examples in the file.]
+- It will include all text in between one `**Q:**` and the next `**Q:**`.
+
+```markdown
+**Q:** [Question 1 here]
+[anything in between these two Q's is part of question 1]
+**Q:** [Question 2 here]
+[anything between here and the next **Q:**, or if this is the last **Q:**, is registered as part of question 2]
 ```
 
 ### Prerequisites

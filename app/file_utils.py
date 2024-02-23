@@ -23,7 +23,7 @@ def extract_questions_from_file(file_path):
     questions = []
     with open(file_path, 'r') as file:
         content = file.read()
-        matches = re.findall(r'- \*\*Q:\*\* (.*?)(?=\n\n- \*\*A:\*\*|$)', content, re.DOTALL)
+        matches = re.findall(r'- \*\*Q:\*\* (.*?)(?=\n- \*\*Q:\*\*|$)', content, re.DOTALL)
         questions.extend(matches)
     return questions
 
