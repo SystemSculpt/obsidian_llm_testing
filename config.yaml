@@ -1,0 +1,5 @@
+base_url: 'http://localhost:1234/v1'
+api_key: 'not-needed'
+questions_file: 'LLM Test.md'
+system_prompt: 'You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful.'
+temperature: 0.2

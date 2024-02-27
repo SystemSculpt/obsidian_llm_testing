@@ -1,7 +1,9 @@
-from app.test_handler import run_tests_loop
-
-def main():
-    run_tests_loop()
+import sys
+from PySide6.QtWidgets import QApplication
+from src.main_window import MainWindow
 
 if __name__ == "__main__":
-    main()
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
