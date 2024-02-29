@@ -26,7 +26,7 @@ def load_questions_from_file(filepath):
     try:
         with open(filepath, "r") as file:
             content = file.read()
-            pattern = r"\*\*Q:\*\*((?:.|\n)*?)(?=\n\*\*Q:\*\*|\Z)"
+            pattern = r"\*\*Q:\*\*\s*((?:.|\n)*?)(?=\n\*\*Q:\*\*|\Z)"
             questions = re.findall(pattern, content, re.DOTALL)
         return questions
     except FileNotFoundError:

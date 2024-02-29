@@ -64,32 +64,26 @@ Neuroscience is the scientific study of the nervous system, encompassing its str
 Q: Give me an Obsidian dataview script for finding all the notes in my vault that have "vid", case in-sensitive, in their title.
 A:
 
-````
 ```dataview
 LIST
 WHERE contains(lower(file.name), "vid")
 ```
-````
 
 Q: script for showing all files with "linked: false" property
 A:
 
-````
 ```dataview
 LIST
 WHERE linked = false
 ```
-````
 
 Q: Give me an Obsidian dataview script for finding all the notes in my vault that have "tweet" in their title, case sensitive.
 A:
 
-````
 ```dataview
 table file.name
 where contains(file.name, "Tweet")
 ```
-````
 
 Now, here's the next question for you to generate a dataview script for me with:
 
@@ -105,8 +99,6 @@ A high quality response from this would be:
 
 Now, here's a different prompt for you to generate from:
 Create a short concise title that portrays the main idea of the note. If there is a date and time in the current note title, make sure to keep it there and just tack on the new generated title to the end of that. Generate a title for the current document 2023-05-28 11-03. (do not use # \* \" / < > : | ? .): # Marketing Strategy Meeting ## Met with Peter and went over, in detail, how we should pursue marketing for our rubber ducky product. We discussed how we should actually just scrap the entire idea because the rubber ducky market is too saturated, and we should instead focus on silicon AI chips due to the new market hype around them.
-
-Your high quality response:
 
 **Q:** Create an email response to a potential collaborator, asking for feedback on a new product idea. The email should be concise, engaging, and include a clear call to action.
 

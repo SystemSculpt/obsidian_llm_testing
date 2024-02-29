@@ -3,5 +3,5 @@ api_key: 'not-needed'
 questions_file: 'LLM Test.md'
 system_prompt: 'You are an intelligent assistant. You always provide well-reasoned answers that are both correct and helpful.'
 temperature: 0.2
-font_size: 23
-window_size: [1900, 1150]
+font_size: 12
+window_size: [1400, 800]
