@@ -64,6 +64,13 @@ class MainWindow(QMainWindow):
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.update_button_text)
             self.timer.start(500)  # Update every 500 milliseconds
+            # Disable UI components
+            self.question_list.setEnabled(False)
+            self.pass_btn.setEnabled(False)
+            self.fail_btn.setEnabled(False)
+            self.generate_answer_btn.setEnabled(False)
+            self.reload_api_btn.setEnabled(False)
+            self.custom_question_btn.setEnabled(False)
             if not self.question_display.isReadOnly():
                 self.question_display.setReadOnly(
                     True
@@ -89,6 +96,13 @@ class MainWindow(QMainWindow):
     def reset_generate_button(self):
         self.generate_answer_btn.setText("Generate Answer")
         self.timer.stop()
+        # Re-enable UI components
+        self.question_list.setEnabled(True)
+        self.pass_btn.setEnabled(True)
+        self.fail_btn.setEnabled(True)
+        self.generate_answer_btn.setEnabled(True)
+        self.reload_api_btn.setEnabled(True)
+        self.custom_question_btn.setEnabled(True)
 
     def update_answer_display(self, message):
         self.answer_display.moveCursor(QTextCursor.End)
@@ -134,6 +148,7 @@ class MainWindow(QMainWindow):
                 QBrush(QColor("black"))
             )  # Set text color to black
             self.graded_questions.add(current_row)  # Add to graded questions
+            self.reset_test_btn.setEnabled(True)  # Enable Reset Test button
         print("Answer marked as Pass")
         self.moveToNextQuestion()
 
@@ -146,6 +161,7 @@ class MainWindow(QMainWindow):
                 QBrush(QColor("black"))
             )  # Set text color to black
             self.graded_questions.add(current_row)  # Add to graded questions
+            self.reset_test_btn.setEnabled(True)  # Enable Reset Test button
         print("Answer marked as Fail")
         self.moveToNextQuestion()
 
@@ -182,3 +198,26 @@ class MainWindow(QMainWindow):
                 "Grading Complete",
                 f"Correctly Answered: {correct_answers}/{total_questions}\nScore: {score_percent:.2f}%",
             )
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
+            self.generate_answer()
+        # j key moves to next item in list, k key moves to previous list item, vim style
+        elif event.key() == Qt.Key_J:
+            # move to next index
+            self.question_list.setCurrentRow((self.question_list.currentRow() + 1) % self.question_list.count())
+        elif event.key() == Qt.Key_K:
+            # move to previous index
+            self.question_list.setCurrentRow((self.question_list.currentRow() - 1) % self.question_list.count())
+        else:
+            super().keyPressEvent(event)
+
+    
+
+    def reset_test(self):
+        for row in range(self.question_list.count()):
+            item = self.question_list.item(row)
+            item.setBackground(QBrush())  # Clear background color to default
+            item.setForeground(QBrush())  # Clear text color to default
+        self.graded_questions.clear()  # Clear graded questions set
+        self.reset_test_btn.setEnabled(False)  # Disable Reset Test button
