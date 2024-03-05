@@ -1,71 +1,90 @@
-# Obsidian LLM Testing
+# Obsidian LLM Testing GUI
 
-## Why This Exists
+## Overview
 
-- Specifically made for testing out local LLMs for Obsidian use.
-- General knowledge should be a prerequisite for an LLM, so we're not testing that anymore. We're focusing on the quality of the answers when it comes to Obsidian / note-taking / personal knowledge management.
+- This project provides a graphical user interface (GUI) application for testing local Large Language Models (LLMs) within the context of Obsidian or similar note-taking and personal knowledge management systems.
 
-## How to Use
+- It aims to facilitate the evaluation of LLMs' performance on tasks relevant to knowledge management, note-taking, and productivity.
 
-- The point of this is to test out your local LLM with questions that are relevant to your personal knowledge management system.
+## Features
 
-- Keep in mind, the questions found in `LLM_Test.md` are just examples. You should add your own questions, or modify the existing ones to better suit your needs. Just make sure to follow the same format and structure:
+- **Local LLM Integration**: Connect to local LLM servers for privacy-focused, offline testing.
+- **Customizable Tests**: Easily modify or add new test questions to suit your specific needs.
+- **Interactive GUI**: Conduct tests and review results through a user-friendly interface.
+- **Performance Metrics**: Track and analyze the performance of your LLM with built-in scoring and feedback mechanisms.
 
-- A question is registered with each `**Q:**`.
+## To Do
 
-- It will include all text in between one `**Q:**` and the next `**Q:**`.
+- [ ] Add a screenshot of the GUI to the README.
+- [ ] Add a GIF of the GUI in action to the README.
+- [ ] Add a section on how to contribute to the project.
+- [ ] Add a section on how to add new test questions.
 
-```markdown
-**Q:** [Question 1 here]
-[anything in between these two Q's is part of question 1]
-**Q:** [Question 2 here]
-[anything between here and the next **Q:**, or if this is the last **Q:**, is registered as part of question 2]
-```
+## Getting Started
 
 ### Prerequisites
 
-- A decent computing system. I personally use 7B parameter models and I'm on an M1 Macbook Pro with 16GB of RAM.
+- Python 3.6 or higher.
+- A local LLM server or access to an LLM API (e.g., OpenAI's GPT models).
+- An environment capable of running PyQt6 applications.
 
-### Start Up Your LLM Server
+### Installation
 
-- I personally use LM Studio. Here's [a video showing how to get set up appropriately.](https://www.youtube.com/watch?v=SAKr008Z8NU)
-- You can use any LLM server you want, but you'll need to modify the `main.py` file to point to your server.
-- FYI, the default is `http://localhost:1234/v1`, found in the `openai_client.py` file.
-- You can also use the OpenAI API directly, but you'll need to modify the `openai_client.py` file to use your API key... though IDK why you'd want to do that since the whole point of this is to test out local LLMs.
+1. **Clone the Repository**:
 
-### Conducting Testing
+```bash
+git clone https://github.com/systemsculpt/obsidian_llm_testing
+cd obsidian_llm_testing
+```
 
-- Once your server is up and running...
-- Open up your terminal and navigate to the directory where you want to clone this repository.
-- Run the following command to clone the repository:
-  ```bash
-  git clone https://github.com/systemsculpt/obsidian_llm_testing
-  ```
+2. **Set Up a Virtual Environment** (optional but recommended):
 
-````
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-- Navigate into the repository:
-  ```bash
-  cd obsidian_llm_testing
-  ```
-- Set up the virtual environment and install the requirements:
-  ```bash
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install -r requirements.txt
-  ```
-- Run the testing script:
-  ```bash
-  python main.py
-  ```
-- Follow the directions, and you're good to go!
-- Results are placed in a `results` directory.
+3. **Install Dependencies**:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Configuration
+
+1. **Edit the Configuration File**: Modify `config.yaml` to set up your LLM server URL, API key (if needed), and other preferences like font size and window size.
+
+2. **Prepare Your Test Questions**: Edit `LLM_Test.md` to include your custom questions. Follow the format provided in the file for consistency.
+
+### Running the Application
+
+- Launch the GUI application by running:
+
+```bash
+python main.py
+```
+
+- The GUI will start, and you can begin testing by following the on-screen instructions.
+
+## Usage
+
+- **Connect to Your LLM Server**: Use the "Reload API Connection" button to connect to your LLM server.
+- **Generate Answers**: Select a question and use the "Generate Answer" button to get responses from your LLM.
+- **Evaluate Responses**: Mark answers as "Pass" or "Fail" based on their relevance and accuracy.
+- **Review Results**: The application automatically calculates and displays performance metrics.
+
+## Customization
+
+- **Adding New Questions**: You can add new questions directly to the `LLM_Test.md` file. Ensure you follow the existing format for compatibility.
+- **Changing the GUI Appearance**: Modify settings in `config.yaml` to adjust the font size, window size, and other UI elements.
 
 ## Contribution
 
-- Your contributions are welcome!
-- If you have ideas for testing, automations, or improvements:
-  - Fork this repository.
-  - Make your changes and test them in Obsidian.
-  - Submit a pull request with a description of your additions or changes.
-````
+Contributions to improve the application or add new features are welcome. Please follow these steps:
+
+1. **Fork the Repository**: Create your own fork of the project.
+2. **Make Your Changes**: Implement your improvements or new features.
+3. **Test Your Changes**: Ensure your changes work as expected, especially with Obsidian.
+4. **Submit a Pull Request**: Create a PR against the main project with a clear description of your changes.
+
+Thank you for contributing to the Obsidian LLM Testing GUI project!
